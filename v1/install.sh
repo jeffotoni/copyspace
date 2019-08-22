@@ -28,7 +28,7 @@ fi
 
 sudo rm -rf $DIR
 sudo mkdir -p $DIR
-sudo wget -c "https://raw.githubusercontent.com/jeffotoni/s3godo/master/spaces/copyspace/v2/copyspace" -P "$DIR"
+sudo wget -c "https://raw.githubusercontent.com/jeffotoni/copyspace/master/v2/copyspace" -P "$DIR"
 echo "..."
 sleep 1
 sudo chmod 755 -R $DIR2
