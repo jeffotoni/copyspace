@@ -109,7 +109,10 @@ func main() {
 
 	// send file origin
 	println(gcolor.CyanCor("domain: " + key.Endpoint))
+	println(gcolor.CyanCor("domain copy: https://" + BUCKET + "." + strings.Replace(key.Endpoint, "https://", "", -1)))
 	println(gcolor.YellowCor("bucket: " + BUCKET))
+	println(gcolor.YellowCor("acl: " + ACL_S3))
+	println(gcolor.YellowCor("path: " + pathFile))
 
 	// send one file
 	if !IsDir(pathFile) {
@@ -186,7 +189,7 @@ func SendFileDO(job sendS3) {
 	start := time.Now()
 	f, err := os.Open(job.Path)
 	if err != nil {
-		fmt.Printf("Erro enviando %s: %v\n", job.Path, err)
+		fmt.Printf("Erro enviando open %s: %v\n", job.Path, err)
 		return
 	}
 	defer f.Close()
@@ -194,7 +197,7 @@ func SendFileDO(job sendS3) {
 	// size file...
 	fi, err := f.Stat()
 	if err != nil {
-		fmt.Printf("Erro enviando %s: %v\n", job.Path, err)
+		fmt.Printf("Erro enviando stat %s: %v\n", job.Path, err)
 		return
 	}
 
@@ -224,7 +227,7 @@ func SendFileDO(job sendS3) {
 	// Upload a file to the Space
 	object := s3.PutObjectInput{
 		ACL:         aws.String(ACL_S3),
-		Body:        f, // execlente
+		Body:        f, // excelente
 		Bucket:      aws.String(BUCKET),
 		Key:         aws.String(job.Pbucket),
 		ContentType: aws.String(contentType),
@@ -232,7 +235,15 @@ func SendFileDO(job sendS3) {
 
 	msgs3V, err := job.S3Client.PutObject(&object)
 	if err != nil {
-		fmt.Printf("Erro enviando %s: %v\n", job.Path, err)
+		println(gcolor.RedCor(".................ERROR................"))
+		println(gcolor.RedCor(
+			"path: " + job.Path +
+				"\nacl: " + ACL_S3 +
+				"\nbucket: " + BUCKET +
+				"\nkey: " + job.Pbucket +
+				"\nError: " + err.Error(),
+		))
+		//fmt.Printf("Erro enviando put \npath: %s:  \nacl: %s \nbucket: %s \nkey: %s \n%v\n", )
 		return
 	}
 
