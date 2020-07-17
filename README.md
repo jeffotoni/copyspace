@@ -1,13 +1,28 @@
 # copyspace
 copyspace é uma ferramenta que copia arquivos para os Buckets da DigitalOcean chamados de Spaces
 
-![terminal Example](assets/index.jpeg)
+Install
+```bash
+$ sh -c "$(wget https://raw.githubusercontent.com/jeffotoni/s3godo/master/spaces/copyspace/v1/install.sh -O -)"
+```
+#### Credenciais
 
+Precisará criar um arquivo oculdo em seu home, .dokeys nele precisa conter suas credenciais.
+```bash
+{
+    "key":"xxxxxxxxxxxx",
+    "secret":"xxxxxxxxxx",
+    "endpoint":"https://sfo2.digitaloceanspaces.com",
+    "region":"us-east-1",
+    "bucket":"your-bucket"
+}
+```
 
-## Troubleshooting
-
-
-### Erro em montar as credenciais
-
-Em **manage > API > spaces access keys> Generate New Key** deve gerar uma key como o nome que *desejar* e um token chamado *Secret*. Caso tenha símbolos ou caracteres que não são aceitos para key ou traga alguma *mensagem* de erro. É recomendado a criação de uma nova key até o resultado ser igual a foto abaixo.
-![Criação de spaces access keys](assets/criacaodechavessucedida.png)
+Feito isto agora ficou fácil, basta executar o copyspace
+```bash
+$ copyspace --file=your-file.pdf --acl=public --bucket=your-bucket
+```
+Copyspace também copia recursivamente
+```bash
+$ copyspace --file=/home/user/projetos --acl=public --bucket=your-bucket
+```
