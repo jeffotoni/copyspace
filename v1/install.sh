@@ -14,11 +14,11 @@ echo "\033[0;33mOk .dokeys existe!\033[0m"
 echo "\033[0;32m#########################################################\033[0m"
 else
 echo '{
-     "key": "key-digitalocean",
-     "secret": "secret-digitalocean",
-     "endpoint": "https://your-space.digitaloceanspaces.com",
-     "region": "us-east-1",
-     "bucket": "your-bucket-default"
+"key": "key-digitalocean",
+"secret": "secret-digitalocean",
+"endpoint": "https://your-space.digitaloceanspaces.com",
+"region": "us-east-1",
+"bucket": "your-bucket-default"
 }' > $HOME/.dokeys
 echo "\033[0;32m#########################################################\033[0m"
 echo "criado ~/.dokeys"

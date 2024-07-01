@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/user"
@@ -57,6 +56,7 @@ func main() {
 	// abir file secrey
 	key, err := ReadKey()
 	if err != nil {
+		fmt.Println("err:", err)
 		fmt.Println("Erro ao montar suas credenciais de acesso ao DigitalOcean Space!")
 		return
 	}
@@ -178,7 +178,7 @@ func worker(ctx context.Context, wg *sync.WaitGroup, jobs <-chan sendS3) {
 	}
 }
 
-//func SendFileDO(pf, pbucket string, s3Client *s3.S3, I int) string {
+// func SendFileDO(pf, pbucket string, s3Client *s3.S3, I int) string {
 func SendFileDO(job sendS3) {
 
 	if IsDir(job.Path) {
@@ -274,9 +274,27 @@ func ReadKey() (*DOKey, error) {
 	// if err != nil {
 	// 	return nil, err
 	// }
+
 	cfgFile := fmt.Sprintf("%s/.dokeys", HOME_DIR)
-	b, err := ioutil.ReadFile(cfgFile)
+	fmt.Println("cfgFile:", cfgFile)
+
+	// file, err := os.Open(cfgFile)
+	// if err != nil {
+	// 	fmt.Println("Error opening file:", err)
+	// 	return nil, err
+	// }
+	// defer file.Close()
+
+	// // Ler o conteúdo do arquivo
+	// b, err := io.ReadAll(file)
+	// if err != nil {
+	// 	fmt.Println("Error reading file:", err)
+	// 	return nil, err
+	// }
+
+	b, err := os.ReadFile(cfgFile)
 	if err != nil {
+		fmt.Println("Error reading file:", err)
 		return nil, err
 	}
 
