@@ -352,9 +352,15 @@ func DownloadAllObjects(client *s3.S3, bucket, dest string) error {
 		for _, obj := range page.Contents {
 			key := *obj.Key
 
-			// Ignora "diretórios" vazios
 			if strings.HasSuffix(key, "/") {
-				continue
+				localDir := filepath.Join(dest, key)
+				err := os.MkdirAll(localDir, 0755)
+				if err != nil {
+					fmt.Println("Erro criando diretório vazio:", localDir, err)
+				} else {
+					fmt.Println("📁 Diretório vazio criado:", localDir)
+				}
+				//return true
 			}
 
 			fmt.Println("⬇️  Baixando:", key)
