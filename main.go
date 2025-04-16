@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/user"
@@ -75,23 +76,16 @@ func main() {
 	var pathFile string
 	var workers int
 
+	var modeDownload bool
+	var downloadPath string
+	flag.BoolVar(&modeDownload, "cp", false, "ativar modo de download do bucket")
+	flag.StringVar(&downloadPath, "out", ".", "diretório de destino para os arquivos baixados")
+
 	flag.StringVar(&pathFile, "file", "", "nome do arquivo ou diretorio a ser enviado")
 	aclSend := flag.String("acl", "private", "permissao: public or private")
 	fbucket := flag.String("bucket", "", "o nome do seu bucket")
 	flag.IntVar(&workers, "worker", WORKER, "quantidade de trabalhos concorrentes em sua máquina")
 	flag.Parse()
-
-	if len(pathFile) == 0 {
-		flag.PrintDefaults()
-		return
-	}
-
-	if len(*aclSend) > 0 &&
-		strings.ToLower(*aclSend) != "private" &&
-		strings.ToLower(*aclSend) != "public" {
-		flag.PrintDefaults()
-		return
-	}
 
 	if len(*aclSend) > 0 && strings.ToLower(*aclSend) == "public" {
 		ACL_S3 = "public-read-write"
@@ -107,6 +101,33 @@ func main() {
 		WORKER = workers
 	}
 
+	if modeDownload {
+		fmt.Println(gcolor.GreenCor("modo: download"))
+		if len(*fbucket) == 0 {
+			fmt.Println("bucket é obrigatório")
+			return
+		}
+
+		fmt.Println("Listando objetos no bucket: ", BUCKET)
+
+		err := DownloadAllObjects(s3Client, BUCKET, downloadPath)
+		if err != nil {
+			fmt.Println("Erro durante o download:", err)
+		}
+		return
+	}
+
+	if len(pathFile) == 0 {
+		flag.PrintDefaults()
+		return
+	}
+
+	if len(*aclSend) > 0 &&
+		strings.ToLower(*aclSend) != "private" &&
+		strings.ToLower(*aclSend) != "public" {
+		flag.PrintDefaults()
+		return
+	}
 	// send file origin
 	println(gcolor.CyanCor("domain: " + key.Endpoint))
 	println(gcolor.CyanCor("domain copy: https://" + BUCKET + "." + strings.Replace(key.Endpoint, "https://", "", -1)))
@@ -306,7 +327,6 @@ func ReadKey() (*DOKey, error) {
 }
 
 func GetFileContentType(out *os.File) (string, error) {
-
 	if _, err := out.Seek(0, 0); err != nil {
 		return "", err
 	}
@@ -321,4 +341,52 @@ func GetFileContentType(out *os.File) (string, error) {
 		return "", err
 	}
 	return http.DetectContentType(buffer), nil
+}
+func DownloadAllObjects(client *s3.S3, bucket, dest string) error {
+	input := &s3.ListObjectsV2Input{
+		Bucket: aws.String(bucket),
+		Prefix: aws.String(""),
+	}
+
+	return client.ListObjectsV2Pages(input, func(page *s3.ListObjectsV2Output, lastPage bool) bool {
+		for _, obj := range page.Contents {
+			key := *obj.Key
+
+			// Ignora "diretórios" vazios
+			if strings.HasSuffix(key, "/") {
+				continue
+			}
+
+			fmt.Println("⬇️  Baixando:", key)
+
+			output, err := client.GetObject(&s3.GetObjectInput{
+				Bucket: aws.String(bucket),
+				Key:    aws.String(key),
+			})
+			if err != nil {
+				fmt.Println("Erro ao baixar:", key, err)
+				continue
+			}
+			defer output.Body.Close()
+
+			localPath := filepath.Join(dest, key)
+			if err := os.MkdirAll(filepath.Dir(localPath), 0755); err != nil {
+				fmt.Println("Erro criando diretório:", err)
+				continue
+			}
+
+			f, err := os.Create(localPath)
+			if err != nil {
+				fmt.Println("Erro criando arquivo local:", err)
+				continue
+			}
+
+			_, err = io.Copy(f, output.Body)
+			f.Close()
+			if err != nil {
+				fmt.Println("Erro escrevendo arquivo:", err)
+			}
+		}
+		return true
+	})
 }
