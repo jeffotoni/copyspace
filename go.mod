@@ -1,9 +1,9 @@
-module copyspace
+module github.com/jeffotoni/copyspace
 
-go 1.22.4
+go 1.24.2
 
 require (
-	github.com/aws/aws-sdk-go v1.54.11
+	github.com/aws/aws-sdk-go v1.55.6
 	github.com/jeffotoni/gcolor v1.0.9
 )
 
