@@ -5,7 +5,7 @@ Copyspace is a powerful and efficient CLI tool for concurrently copying files an
 # copyspace in action 💕🐧🚀
 
 
-![copyspace](https://github.com/jeffotoni/copyspace/blob/master/gif/copyspace_upload.gif)
+![copyspace demo](gif/copyspace_upload.gif)
 
 ## 🌟 Main features
 
