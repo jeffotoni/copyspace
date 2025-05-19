@@ -18,6 +18,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/jeffotoni/gcolor"
 )
 
@@ -29,9 +30,10 @@ var (
 )
 
 type sendS3 struct {
-	Path     string
-	Pbucket  string
-	S3Client *s3.S3
+	Path    string
+	Pbucket string
+	// S3Client *s3.S3
+	S3Client s3iface.S3API
 	Counter  int
 }
 
@@ -342,7 +344,9 @@ func GetFileContentType(out *os.File) (string, error) {
 	}
 	return http.DetectContentType(buffer), nil
 }
-func DownloadAllObjects(client *s3.S3, bucket, dest string) error {
+
+func DownloadAllObjects(client s3iface.S3API, bucket, dest string) error {
+	// func DownloadAllObjects(client *s3.S3, bucket, dest string) error {
 	input := &s3.ListObjectsV2Input{
 		Bucket: aws.String(bucket),
 		Prefix: aws.String(""),
