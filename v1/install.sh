@@ -7,18 +7,44 @@ EXEC="copyspace"
 INSTALL_DIR="/usr/local/bin"
 BIN_PATH="$INSTALL_DIR/$EXEC"
 DOKEYS="$HOME/.dokeys"
-BINARY_URL="https://raw.githubusercontent.com/jeffotoni/copyspace/refs/heads/master/v1/copyspace"
+BASE_URL="https://raw.githubusercontent.com/jeffotoni/copyspace/refs/heads/master/v1"
 
 COLOR_GREEN='\033[0;32m'
 COLOR_YELLOW='\033[1;33m'
 COLOR_RESET='\033[0m'
 
-# Detect OS (Linux or Mac)
+# Detect OS and ARCH
 OS="$(uname -s)"
-if [[ "$OS" != "Linux" && "$OS" != "Darwin" ]]; then
-    echo -e "${COLOR_YELLOW}Unsupported OS: $OS${COLOR_RESET}"
-    exit 1
-fi
+ARCH="$(uname -m)"
+
+case "$OS" in
+    Linux)
+        if [[ "$ARCH" == "x86_64" ]]; then
+            BIN_NAME="copyspace-linux-amd64"
+        elif [[ "$ARCH" == "i386" || "$ARCH" == "i686" ]]; then
+            BIN_NAME="copyspace-linux-386"
+        else
+            echo -e "${COLOR_YELLOW}Unsupported Linux architecture: $ARCH${COLOR_RESET}"
+            exit 1
+        fi
+        ;;
+    Darwin)
+        if [[ "$ARCH" == "arm64" ]]; then
+            BIN_NAME="copyspace-mac-arm64"
+        elif [[ "$ARCH" == "x86_64" ]]; then
+            BIN_NAME="copyspace-mac-amd64"
+        else
+            echo -e "${COLOR_YELLOW}Unsupported Mac architecture: $ARCH${COLOR_RESET}"
+            exit 1
+        fi
+        ;;
+    *)
+        echo -e "${COLOR_YELLOW}Unsupported OS: $OS${COLOR_RESET}"
+        exit 1
+        ;;
+esac
+
+BINARY_URL="$BASE_URL/$BIN_NAME"
 
 # Check dependencies
 if command -v wget >/dev/null 2>&1; then
@@ -34,11 +60,6 @@ fi
 if ! echo "$PATH" | grep -q "/usr/local/bin"; then
   echo -e "${COLOR_YELLOW}/usr/local/bin is not in your PATH. To fix this, add the following to your shell profile:${COLOR_RESET}"
   echo -e "${COLOR_GREEN}export PATH=\"/usr/local/bin:\$PATH\"${COLOR_RESET}"
-  if [ -n "$SHELLRC" ]; then
-    echo -e "${COLOR_YELLOW}(e.g., add to $SHELLRC and run: source $SHELLRC)${COLOR_RESET}"
-  fi
-else
-  echo -e "${COLOR_GREEN}/usr/local/bin is present in your PATH.${COLOR_RESET}"
 fi
 
 # Ensure install dir exists and is writable
@@ -52,7 +73,7 @@ if [ ! -w "$INSTALL_DIR" ]; then
 fi
 
 # Download the binary
-echo -e "${COLOR_GREEN}Downloading $EXEC binary to $BIN_PATH...${COLOR_RESET}"
+echo -e "${COLOR_GREEN}Downloading $EXEC binary for $OS/$ARCH to $BIN_PATH...${COLOR_RESET}"
 $DL_CMD "$BIN_PATH" "$BINARY_URL"
 
 chmod +x "$BIN_PATH"
@@ -73,7 +94,7 @@ else
     echo -e "${COLOR_GREEN}Config $DOKEYS found. Skipping creation.${COLOR_RESET}"
 fi
 
-# Reload shell profile if needed
+# Suggest reloading shell profile
 if [[ -f "$HOME/.zshrc" ]]; then
     SHELLRC="$HOME/.zshrc"
 elif [[ -f "$HOME/.bashrc" ]]; then
@@ -117,10 +138,10 @@ fi
 # Warn if another copyspace exists elsewhere in PATH
 echo
 echo -e "${COLOR_GREEN}Checking for duplicate copyspace binaries:${COLOR_RESET}"
-BIN_PATH="$(which copyspace 2>/dev/null || true)"
-if [[ "$BIN_PATH" != "/usr/local/bin/copyspace" ]]; then
-  echo -e "${COLOR_YELLOW}⚠️  Warning: 'which copyspace' points to $BIN_PATH${COLOR_RESET}"
+BIN_PATH_ACTUAL="$(which copyspace 2>/dev/null || true)"
+if [[ "$BIN_PATH_ACTUAL" != "/usr/local/bin/copyspace" ]]; then
+  echo -e "${COLOR_YELLOW}⚠️  Warning: 'which copyspace' points to $BIN_PATH_ACTUAL${COLOR_RESET}"
   echo -e "${COLOR_YELLOW}If you installed elsewhere or have another version, remove or update your PATH order to prioritize /usr/local/bin.${COLOR_RESET}"
 else
-  echo -e "${COLOR_GREEN}Your 'copyspace' command is ready: $BIN_PATH${COLOR_RESET}"
+  echo -e "${COLOR_GREEN}Your 'copyspace' command is ready: $BIN_PATH_ACTUAL${COLOR_RESET}"
 fi

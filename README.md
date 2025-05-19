@@ -85,6 +85,29 @@ You will need to create a hidden file in your home, .dokeys which needs to conta
     "bucket":"your-bucket"
 }
 ```
+## 🛠️ Building Binaries for Multiple Platforms
+
+You can easily build platform-specific binaries using the provided Makefile:
+
+```bash
+# Build all binaries (Mac ARM, Mac Intel, Linux AMD64, Linux 386)
+make
+
+# Build only for your current platform (e.g., Mac ARM64)
+make mac-arm64
+
+# Clean up all generated binaries
+make clean
+```
+Binaries generated:
+    • copyspace-mac-arm64
+    • copyspace-mac-amd64
+    • copyspace-linux-amd64
+    • copyspace-linux-386
+    • copyspace-windows-amd64.exe
+    • copyspace-windows-386.exe
+
+## 🛠️ Commands copyspace
 
 Upload a single file to the bucket
 ```bash
