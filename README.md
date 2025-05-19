@@ -18,8 +18,55 @@ Copyspace is a powerful and efficient CLI tool for concurrently copying files an
 You can install Copyspace easily on any Linux or Mac system by running:
 
 ```bash
-$ sh -c "$(wget https://raw.githubusercontent.com/jeffotoni/copyspace/refs/heads/master/v1/install.sh -O -)"
+sh -c "$(wget https://raw.githubusercontent.com/jeffotoni/copyspace/refs/heads/master/v1/install.sh -O -)"
 ```
+
+### **After installation, make sure `/usr/local/bin` is in your PATH:**
+
+### 1. Check if /usr/local/bin is in your PATH
+```bash
+echo $PATH
+```
+
+If /usr/local/bin is missing, add it to your shell configuration file:
+ - For Zsh users, add this line to your ~/.zshrc:
+
+```bash
+export PATH="/usr/local/bin:$PATH"
+```
+
+For Bash users, add this line to your ~/.bashrc:
+```bash
+export PATH="/usr/local/bin:$PATH"
+```
+
+Then reload your shell (replace with your shell as appropriate):
+```bash
+source ~/.zshrc
+# or
+source ~/.bashrc
+```
+
+### 2. Verify your installation
+```bash
+which copyspace
+```
+
+It should print something like:
+```bash
+/usr/local/bin/copyspace
+```
+
+Check which copyspace binary is found first in your PATH:
+
+Now, you can run:
+```bash
+copyspace -h
+```
+
+If you still have issues, check for duplicate or conflicting binaries in other directories (e.g., /usr/bin).
+Adjust your PATH order if needed to prioritize /usr/local/bin.
+
 #### Credenciais
 
 You will need to create a hidden file in your home, .dokeys which needs to contain your credentials.

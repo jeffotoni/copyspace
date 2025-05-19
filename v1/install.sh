@@ -30,6 +30,17 @@ else
     exit 1
 fi
 
+# Check if /usr/local/bin is in PATH
+if ! echo "$PATH" | grep -q "/usr/local/bin"; then
+  echo -e "${COLOR_YELLOW}/usr/local/bin is not in your PATH. To fix this, add the following to your shell profile:${COLOR_RESET}"
+  echo -e "${COLOR_GREEN}export PATH=\"/usr/local/bin:\$PATH\"${COLOR_RESET}"
+  if [ -n "$SHELLRC" ]; then
+    echo -e "${COLOR_YELLOW}(e.g., add to $SHELLRC and run: source $SHELLRC)${COLOR_RESET}"
+  fi
+else
+  echo -e "${COLOR_GREEN}/usr/local/bin is present in your PATH.${COLOR_RESET}"
+fi
+
 # Ensure install dir exists and is writable
 if [ ! -d "$INSTALL_DIR" ]; then
     sudo mkdir -p "$INSTALL_DIR"
@@ -87,3 +98,29 @@ if [[ -n "$SHELLRC" ]]; then
 fi
 
 echo -e "${COLOR_GREEN}######### Thanks for Download ##########${COLOR_RESET}"
+
+# ===== PATH DIAGNOSTIC AND GUIDANCE =====
+echo
+if ! echo "$PATH" | grep -q "/usr/local/bin"; then
+  echo -e "${COLOR_YELLOW}⚠️  /usr/local/bin is not in your PATH!${COLOR_RESET}"
+  echo -e "${COLOR_YELLOW}Add this line to your shell profile to use copyspace globally:${COLOR_RESET}"
+  if [[ -n "$SHELLRC" ]]; then
+    echo -e "${COLOR_GREEN}  export PATH=\"/usr/local/bin:\$PATH\"  # Add this to $SHELLRC${COLOR_RESET}"
+    echo -e "${COLOR_YELLOW}  Then run: source $SHELLRC${COLOR_RESET}"
+  else
+    echo -e "${COLOR_GREEN}  export PATH=\"/usr/local/bin:\$PATH\"  # Add this to your shell config file${COLOR_RESET}"
+  fi
+else
+  echo -e "${COLOR_GREEN}/usr/local/bin is present in your PATH. Good to go!${COLOR_RESET}"
+fi
+
+# Warn if another copyspace exists elsewhere in PATH
+echo
+echo -e "${COLOR_GREEN}Checking for duplicate copyspace binaries:${COLOR_RESET}"
+BIN_PATH="$(which copyspace 2>/dev/null || true)"
+if [[ "$BIN_PATH" != "/usr/local/bin/copyspace" ]]; then
+  echo -e "${COLOR_YELLOW}⚠️  Warning: 'which copyspace' points to $BIN_PATH${COLOR_RESET}"
+  echo -e "${COLOR_YELLOW}If you installed elsewhere or have another version, remove or update your PATH order to prioritize /usr/local/bin.${COLOR_RESET}"
+else
+  echo -e "${COLOR_GREEN}Your 'copyspace' command is ready: $BIN_PATH${COLOR_RESET}"
+fi
