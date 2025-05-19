@@ -2,6 +2,9 @@
 
 Copyspace is a powerful and efficient CLI tool for concurrently copying files and directories to DigitalOcean Spaces and AWS S3-compatible buckets. Written in Go, it uses goroutines to maximize transfer speeds and supports multiple concurrent workers. Ideal for backups, migrations, and synchronization in multi-cloud environments.
 
+# copyspace in action 💕🐧🚀
+![copyspace](copyspace_upload.gif)
+
 ## 🌟 Main features
 
 • Concurrent upload and download of files and directories
