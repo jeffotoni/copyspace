@@ -100,6 +100,7 @@ make mac-arm64
 make clean
 ```
 Binaries generated:
+
     • copyspace-mac-arm64
     • copyspace-mac-amd64
     • copyspace-linux-amd64
